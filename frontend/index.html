@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Weather App</title>
 
     <link rel="stylesheet" href="/frontend/style.css" />
@@ -11,38 +12,58 @@
   <body>
     <div class="container">
       <h1>🌤 Weather App</h1>
+
       <p class="subtitle">Check the current weather anywhere</p>
 
+      <!-- Search -->
+
       <div class="search-box">
-        <input type="text" id="cityInput" placeholder="Enter city name..." />
+        <input
+          type="text"
+          id="cityInput"
+          placeholder="Enter city name..."
+          autocomplete="off"
+        />
 
         <button onclick="getWeather()">Search</button>
       </div>
 
+      <!-- Error message -->
+
       <div id="error" class="error"></div>
 
+      <!-- Weather -->
+
       <div id="weatherCard" class="weather-card">
-        <h2 id="city">London</h2>
+        <h2 id="city">Search for a city</h2>
 
         <div class="temperature"><span id="temperature">--</span>°C</div>
 
         <p id="condition">Weather condition</p>
 
+        <!-- Weather details -->
+
         <div class="details">
           <div class="detail">
             <span>💧</span>
+
             <p>Humidity</p>
-            <strong id="humidity">--%</strong>
+
+            <strong id="humidity"> --% </strong>
           </div>
 
           <div class="detail">
             <span>🌡️</span>
+
             <p>Temperature</p>
-            <strong id="temperature2">--°C</strong>
+
+            <strong id="temperature2"> --°C </strong>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- JavaScript -->
 
     <script src="/frontend/script.js"></script>
   </body>

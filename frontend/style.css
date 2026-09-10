@@ -5,8 +5,9 @@
 }
 
 body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #74ebd5, #9face6);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Arial,
+    sans-serif;
 
   min-height: 100vh;
 
@@ -14,36 +15,59 @@ body {
   justify-content: center;
   align-items: center;
 
-  color: #222;
+  padding: 20px;
+
+  background: linear-gradient(160deg, #1d4ed8 0%, #2563eb 35%, #38bdf8 100%);
+
+  color: white;
 }
 
+/* Main container */
+
 .container {
-  width: 90%;
+  width: 100%;
   max-width: 500px;
 
-  background: white;
+  padding: 35px;
 
-  padding: 40px;
+  border-radius: 30px;
 
-  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.16);
 
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
 
   text-align: center;
 }
 
+/* Title */
+
 h1 {
-  font-size: 32px;
-  margin-bottom: 10px;
+  font-size: 38px;
+  font-weight: 700;
+
+  margin-bottom: 8px;
+
+  letter-spacing: -1px;
 }
 
 .subtitle {
-  color: #666;
+  font-size: 16px;
+
+  color: rgba(255, 255, 255, 0.8);
+
   margin-bottom: 30px;
 }
 
+/* Search */
+
 .search-box {
   display: flex;
+
   gap: 10px;
 
   margin-bottom: 20px;
@@ -52,19 +76,23 @@ h1 {
 .search-box input {
   flex: 1;
 
-  padding: 14px;
+  padding: 14px 18px;
 
-  border: 1px solid #ccc;
+  border: none;
 
-  border-radius: 10px;
+  border-radius: 15px;
+
+  outline: none;
 
   font-size: 16px;
 
-  outline: none;
+  color: #222;
+
+  background: rgba(255, 255, 255, 0.95);
 }
 
-.search-box input:focus {
-  border-color: #667eea;
+.search-box input::placeholder {
+  color: #777;
 }
 
 .search-box button {
@@ -72,87 +100,153 @@ h1 {
 
   border: none;
 
-  border-radius: 10px;
+  border-radius: 15px;
 
-  background: #667eea;
+  background: rgba(255, 255, 255, 0.95);
 
-  color: white;
+  color: #2563eb;
 
   font-size: 16px;
 
+  font-weight: 600;
+
   cursor: pointer;
+
+  transition: 0.2s;
 }
 
 .search-box button:hover {
-  opacity: 0.9;
+  transform: scale(1.04);
+
+  background: white;
 }
+
+/* Error */
 
 .error {
-  color: #e74c3c;
+  min-height: 20px;
 
   margin-bottom: 15px;
 
-  min-height: 20px;
+  color: #ffe4e6;
+
+  font-size: 14px;
 }
+
+/* Weather card */
 
 .weather-card {
-  background: #f5f7ff;
+  padding: 30px 20px;
 
-  padding: 30px;
+  border-radius: 25px;
 
-  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.14);
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  backdrop-filter: blur(15px);
 }
+
+/* City */
 
 .weather-card h2 {
-  font-size: 28px;
+  font-size: 30px;
 
-  margin-bottom: 15px;
+  font-weight: 600;
+
+  margin-bottom: 5px;
 }
+
+/* Temperature */
 
 .temperature {
-  font-size: 60px;
+  font-size: 78px;
 
-  font-weight: bold;
+  font-weight: 300;
 
-  margin-bottom: 10px;
+  line-height: 1;
+
+  margin: 20px 0 12px;
+
+  letter-spacing: -3px;
 }
+
+/* Weather condition */
 
 .weather-card > p {
-  color: #555;
+  font-size: 20px;
 
-  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
 
-  margin-bottom: 25px;
+  margin-bottom: 30px;
 }
+
+/* Details */
 
 .details {
   display: flex;
 
-  justify-content: space-around;
+  gap: 12px;
 
-  gap: 20px;
+  justify-content: center;
 }
 
 .detail {
-  background: white;
-
-  padding: 15px;
-
-  border-radius: 12px;
-
   width: 50%;
+
+  padding: 18px 10px;
+
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.14);
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .detail span {
-  font-size: 25px;
+  display: block;
+
+  font-size: 26px;
+
+  margin-bottom: 8px;
 }
 
 .detail p {
-  color: #777;
+  font-size: 14px;
 
-  margin: 5px 0;
+  color: rgba(255, 255, 255, 0.7);
+
+  margin-bottom: 5px;
 }
 
 .detail strong {
   font-size: 18px;
+
+  color: white;
+}
+
+/* Mobile */
+
+@media (max-width: 500px) {
+  .container {
+    padding: 25px 18px;
+
+    border-radius: 25px;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  .search-box {
+    flex-direction: column;
+  }
+
+  .search-box button {
+    width: 100%;
+  }
+
+  .temperature {
+    font-size: 65px;
+  }
 }
