@@ -10,14 +10,13 @@ import os
 load_dotenv()
 
 # Create FastAPI app
-app = FastAPI(title="Book Management API")
+app = FastAPI(title="Weather API")
 
 # Get API key from .env
 API_KEY = os.getenv("API_KEY")
 
-# Store books
-books = []
-
+# Store tasks
+tasks = []
 
 # Serve frontend files
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
@@ -33,16 +32,24 @@ def home():
 
 
 # -------------------------
-# External Book API
+# Weather API
 # -------------------------
 
-@app.get("/search/{book}")
-async def search_book(book: str):
+@app.get("/weather/{city}")
+async def weather(city: str):
 
-    url = "https://www.googleapis.com/books/v1/volumes"
+    if not API_KEY:
+        raise HTTPException(
+            status_code=500,
+            detail="API_KEY is missing from .env"
+        )
+
+    url = "https://api.openweathermap.org/data/2.5/weather"
 
     params = {
-        "q": book
+        "q": city,
+        "appid": API_KEY,
+        "units": "metric"
     }
 
     async with httpx.AsyncClient() as client:
@@ -51,121 +58,113 @@ async def search_book(book: str):
     if response.status_code != 200:
         raise HTTPException(
             status_code=response.status_code,
-            detail="Failed to fetch book data"
+            detail=response.json()
         )
 
     data = response.json()
 
-    results = []
-
-    for item in data.get("items", [])[:5]:
-
-        volume = item.get("volumeInfo", {})
-
-        results.append({
-            "title": volume.get("title"),
-            "authors": volume.get("authors", []),
-            "publisher": volume.get("publisher"),
-            "published_date": volume.get("publishedDate")
-        })
-
-    return results
+    return {
+        "city": data["name"],
+        "temperature": data["main"]["temp"],
+        "humidity": data["main"]["humidity"],
+        "condition": data["weather"][0]["main"]
+    }
 
 
 # -------------------------
-# Book Model
+# Task Model
 # -------------------------
 
-class Book(BaseModel):
+class Task(BaseModel):
     title: str
-    author: str
-    category: str = "general"
-    status: str = "available"
+    description: str
+    category: str = "daily"
+    status: str = "pending"
 
 
 # -------------------------
-# Create Book
+# Create Task
 # -------------------------
 
-@app.post("/books")
-def create_book(book: Book):
+@app.post("/tasks")
+def create_task(task: Task):
 
-    new_book = book.model_dump()
+    new_task = task.model_dump()
 
-    new_book["id"] = len(books) + 1
+    new_task["id"] = len(tasks) + 1
 
-    books.append(new_book)
+    tasks.append(new_task)
 
-    return new_book
-
-
-# -------------------------
-# Get All Books
-# -------------------------
-
-@app.get("/books")
-def get_books():
-
-    return books
+    return new_task
 
 
 # -------------------------
-# Get One Book
+# Get All Tasks
 # -------------------------
 
-@app.get("/books/{book_id}")
-def get_book(book_id: int):
+@app.get("/tasks")
+def get_tasks():
 
-    for book in books:
+    return tasks
 
-        if book["id"] == book_id:
-            return book
+
+# -------------------------
+# Get One Task
+# -------------------------
+
+@app.get("/tasks/{task_id}")
+def get_task(task_id: int):
+
+    for task in tasks:
+
+        if task["id"] == task_id:
+            return task
 
     raise HTTPException(
         status_code=404,
-        detail="Book not found"
+        detail="Task not found"
     )
 
 
 # -------------------------
-# Update Book
+# Update Task
 # -------------------------
 
-@app.put("/books/{book_id}")
-def update_book(book_id: int, book: Book):
+@app.put("/tasks/{task_id}")
+def update_task(task_id: int, task: Task):
 
-    for old_book in books:
+    for old_task in tasks:
 
-        if old_book["id"] == book_id:
+        if old_task["id"] == task_id:
 
-            old_book.update(book.model_dump())
+            old_task.update(task.model_dump())
 
-            return old_book
+            return old_task
 
     raise HTTPException(
         status_code=404,
-        detail="Book not found"
+        detail="Task not found"
     )
 
 
 # -------------------------
-# Delete Book
+# Delete Task
 # -------------------------
 
-@app.delete("/books/{book_id}")
-def delete_book(book_id: int):
+@app.delete("/tasks/{task_id}")
+def delete_task(task_id: int):
 
-    for book in books:
+    for task in tasks:
 
-        if book["id"] == book_id:
+        if task["id"] == task_id:
 
-            books.remove(book)
+            tasks.remove(task)
 
             return {
-                "message": "Book deleted"
+                "message": "Task deleted"
             }
 
     raise HTTPException(
         status_code=404,
-        detail="Book not found"
+        detail="Task not found"
     )
