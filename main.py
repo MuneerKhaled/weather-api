@@ -9,8 +9,8 @@ import os
 # Load environment variables
 load_dotenv()
 
-# Create FastAPI app
-app = FastAPI(title="Weather API")
+# Create FastAPI application
+app = FastAPI(title="Weather and Task API")
 
 # Get API key from .env
 API_KEY = os.getenv("API_KEY")
@@ -36,12 +36,12 @@ def home():
 # -------------------------
 
 @app.get("/weather/{city}")
-async def weather(city: str):
+async def get_weather(city: str):
 
     if not API_KEY:
         raise HTTPException(
             status_code=500,
-            detail="API_KEY is missing from .env"
+            detail="API key is not configured"
         )
 
     url = "https://api.openweathermap.org/data/2.5/weather"
@@ -67,7 +67,7 @@ async def weather(city: str):
         "city": data["name"],
         "temperature": data["main"]["temp"],
         "humidity": data["main"]["humidity"],
-        "condition": data["weather"][0]["main"]
+        "weather": data["weather"][0]["description"]
     }
 
 
@@ -78,8 +78,8 @@ async def weather(city: str):
 class Task(BaseModel):
     title: str
     description: str
-    category: str = "daily"
-    status: str = "pending"
+    priority: str = "medium"
+    completed: bool = False
 
 
 # -------------------------
@@ -103,17 +103,20 @@ def create_task(task: Task):
 # -------------------------
 
 @app.get("/tasks")
-def get_tasks():
+def get_all_tasks():
 
-    return tasks
+    return {
+        "total": len(tasks),
+        "tasks": tasks
+    }
 
 
 # -------------------------
-# Get One Task
+# Get Single Task
 # -------------------------
 
 @app.get("/tasks/{task_id}")
-def get_task(task_id: int):
+def get_single_task(task_id: int):
 
     for task in tasks:
 
@@ -133,13 +136,13 @@ def get_task(task_id: int):
 @app.put("/tasks/{task_id}")
 def update_task(task_id: int, task: Task):
 
-    for old_task in tasks:
+    for existing_task in tasks:
 
-        if old_task["id"] == task_id:
+        if existing_task["id"] == task_id:
 
-            old_task.update(task.model_dump())
+            existing_task.update(task.model_dump())
 
-            return old_task
+            return existing_task
 
     raise HTTPException(
         status_code=404,
@@ -161,7 +164,8 @@ def delete_task(task_id: int):
             tasks.remove(task)
 
             return {
-                "message": "Task deleted"
+                "message": "Task removed successfully",
+                "id": task_id
             }
 
     raise HTTPException(
