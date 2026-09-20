@@ -6,165 +6,188 @@ from dotenv import load_dotenv
 import httpx
 import os
 
+
 # Load environment variables
 load_dotenv()
 
-# Create FastAPI app
-app = FastAPI(title="Weather API")
-
-# Get API key from .env
-API_KEY = os.getenv("API_KEY")
-
-# Store tasks
-tasks = []
-
-# Serve frontend files
-app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
+# Initialize FastAPI application
+app = FastAPI(title="Weather & Notes API")
 
 
-# -------------------------
-# Frontend
-# -------------------------
+# OpenWeather API key
+WEATHER_API_KEY = os.getenv("API_KEY")
+
+
+# In-memory notes storage
+notes = []
+
+
+# Serve frontend
+app.mount(
+    "/static",
+    StaticFiles(directory="frontend"),
+    name="static"
+)
+
+
+# =========================
+# Home
+# =========================
 
 @app.get("/")
-def home():
+def index():
     return FileResponse("frontend/index.html")
 
 
-# -------------------------
-# Weather API
-# -------------------------
+# =========================
+# Weather
+# =========================
 
-@app.get("/weather/{city}")
-async def weather(city: str):
+@app.get("/api/weather")
+async def get_weather(city: str):
 
-    if not API_KEY:
+    if not WEATHER_API_KEY:
         raise HTTPException(
             status_code=500,
-            detail="API_KEY is missing from .env"
+            detail="Weather API key is not configured"
         )
 
-    url = "https://api.openweathermap.org/data/2.5/weather"
+    weather_url = "https://api.openweathermap.org/data/2.5/weather"
 
-    params = {
+    query = {
         "q": city,
-        "appid": API_KEY,
+        "appid": WEATHER_API_KEY,
         "units": "metric"
     }
 
     async with httpx.AsyncClient() as client:
-        response = await client.get(url, params=params)
 
-    if response.status_code != 200:
-        raise HTTPException(
-            status_code=response.status_code,
-            detail=response.json()
+        result = await client.get(
+            weather_url,
+            params=query
         )
 
-    data = response.json()
+    if result.status_code != 200:
+        raise HTTPException(
+            status_code=result.status_code,
+            detail="Unable to retrieve weather information"
+        )
+
+    weather_data = result.json()
 
     return {
-        "city": data["name"],
-        "temperature": data["main"]["temp"],
-        "humidity": data["main"]["humidity"],
-        "condition": data["weather"][0]["main"]
+        "location": weather_data["name"],
+        "temperature_celsius": weather_data["main"]["temp"],
+        "feels_like": weather_data["main"]["feels_like"],
+        "humidity": weather_data["main"]["humidity"],
+        "weather": weather_data["weather"][0]["description"]
     }
 
 
-# -------------------------
-# Task Model
-# -------------------------
+# =========================
+# Note Model
+# =========================
 
-class Task(BaseModel):
+class Note(BaseModel):
     title: str
-    description: str
-    category: str = "daily"
-    status: str = "pending"
+    content: str
+    priority: str = "normal"
+    completed: bool = False
 
 
-# -------------------------
-# Create Task
-# -------------------------
+# =========================
+# Create Note
+# =========================
 
-@app.post("/tasks")
-def create_task(task: Task):
+@app.post("/notes")
+def add_note(note: Note):
 
-    new_task = task.model_dump()
+    note_data = note.model_dump()
 
-    new_task["id"] = len(tasks) + 1
+    note_data["id"] = len(notes) + 1
 
-    tasks.append(new_task)
+    notes.append(note_data)
 
-    return new_task
-
-
-# -------------------------
-# Get All Tasks
-# -------------------------
-
-@app.get("/tasks")
-def get_tasks():
-
-    return tasks
+    return {
+        "message": "Note created successfully",
+        "note": note_data
+    }
 
 
-# -------------------------
-# Get One Task
-# -------------------------
+# =========================
+# Get All Notes
+# =========================
 
-@app.get("/tasks/{task_id}")
-def get_task(task_id: int):
+@app.get("/notes")
+def list_notes():
 
-    for task in tasks:
-
-        if task["id"] == task_id:
-            return task
-
-    raise HTTPException(
-        status_code=404,
-        detail="Task not found"
-    )
+    return {
+        "count": len(notes),
+        "notes": notes
+    }
 
 
-# -------------------------
-# Update Task
-# -------------------------
+# =========================
+# Get Single Note
+# =========================
 
-@app.put("/tasks/{task_id}")
-def update_task(task_id: int, task: Task):
+@app.get("/notes/{note_id}")
+def get_note(note_id: int):
 
-    for old_task in tasks:
+    for note in notes:
 
-        if old_task["id"] == task_id:
-
-            old_task.update(task.model_dump())
-
-            return old_task
+        if note["id"] == note_id:
+            return note
 
     raise HTTPException(
         status_code=404,
-        detail="Task not found"
+        detail="Note not found"
     )
 
 
-# -------------------------
-# Delete Task
-# -------------------------
+# =========================
+# Update Note
+# =========================
 
-@app.delete("/tasks/{task_id}")
-def delete_task(task_id: int):
+@app.patch("/notes/{note_id}")
+def edit_note(note_id: int, updated_note: Note):
 
-    for task in tasks:
+    for note in notes:
 
-        if task["id"] == task_id:
+        if note["id"] == note_id:
 
-            tasks.remove(task)
+            note.update(updated_note.model_dump())
 
             return {
-                "message": "Task deleted"
+                "message": "Note updated successfully",
+                "note": note
             }
 
     raise HTTPException(
         status_code=404,
-        detail="Task not found"
+        detail="Note not found"
+    )
+
+
+# =========================
+# Delete Note
+# =========================
+
+@app.delete("/notes/{note_id}")
+def remove_note(note_id: int):
+
+    for index, note in enumerate(notes):
+
+        if note["id"] == note_id:
+
+            deleted_note = notes.pop(index)
+
+            return {
+                "message": "Note deleted successfully",
+                "note": deleted_note
+            }
+
+    raise HTTPException(
+        status_code=404,
+        detail="Note not found"
     )
