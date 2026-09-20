@@ -1,8 +1,16 @@
+/* -------------------------
+   Reset
+------------------------- */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
+/* -------------------------
+   Body
+------------------------- */
 
 body {
   font-family:
@@ -15,96 +23,115 @@ body {
   justify-content: center;
   align-items: center;
 
-  padding: 20px;
+  padding: 24px;
 
-  background: linear-gradient(160deg, #1d4ed8 0%, #2563eb 35%, #38bdf8 100%);
+  background: linear-gradient(145deg, #0f172a 0%, #1e40af 45%, #0ea5e9 100%);
 
-  color: white;
+  color: #ffffff;
 }
 
-/* Main container */
+/* -------------------------
+   Main Container
+------------------------- */
 
 .container {
   width: 100%;
-  max-width: 500px;
+  max-width: 520px;
 
-  padding: 35px;
+  padding: 38px 32px;
 
-  border-radius: 30px;
+  border-radius: 28px;
 
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.12);
 
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
 
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.22);
 
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
 
   text-align: center;
 }
 
-/* Title */
+/* -------------------------
+   Heading
+------------------------- */
 
 h1 {
-  font-size: 38px;
+  font-size: 40px;
+
   font-weight: 700;
 
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 
-  letter-spacing: -1px;
+  letter-spacing: -1.5px;
 }
 
 .subtitle {
-  font-size: 16px;
+  font-size: 15px;
 
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.75);
 
-  margin-bottom: 30px;
+  margin-bottom: 28px;
 }
 
-/* Search */
+/* -------------------------
+   Search Box
+------------------------- */
 
 .search-box {
   display: flex;
 
-  gap: 10px;
+  gap: 12px;
 
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .search-box input {
   flex: 1;
 
-  padding: 14px 18px;
+  padding: 15px 18px;
 
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 
-  border-radius: 15px;
+  border-radius: 14px;
 
   outline: none;
 
   font-size: 16px;
 
-  color: #222;
+  color: #1e293b;
 
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.94);
+
+  transition: 0.2s;
+}
+
+.search-box input:focus {
+  background: #ffffff;
+
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
 }
 
 .search-box input::placeholder {
-  color: #777;
+  color: #64748b;
 }
 
+/* -------------------------
+   Search Button
+------------------------- */
+
 .search-box button {
-  padding: 14px 20px;
+  padding: 15px 22px;
 
   border: none;
 
-  border-radius: 15px;
+  border-radius: 14px;
 
-  background: rgba(255, 255, 255, 0.95);
+  background: #ffffff;
 
-  color: #2563eb;
+  color: #1d4ed8;
 
   font-size: 16px;
 
@@ -112,81 +139,109 @@ h1 {
 
   cursor: pointer;
 
-  transition: 0.2s;
+  transition:
+    transform 0.2s,
+    background 0.2s,
+    box-shadow 0.2s;
 }
 
 .search-box button:hover {
-  transform: scale(1.04);
+  transform: translateY(-2px);
 
-  background: white;
+  background: #f8fafc;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Error */
+.search-box button:active {
+  transform: translateY(0);
+}
+
+/* -------------------------
+   Error Message
+------------------------- */
 
 .error {
   min-height: 20px;
 
-  margin-bottom: 15px;
+  margin-bottom: 16px;
 
-  color: #ffe4e6;
+  color: #fecdd3;
 
   font-size: 14px;
 }
 
-/* Weather card */
+/* -------------------------
+   Weather Card
+------------------------- */
 
 .weather-card {
-  padding: 30px 20px;
+  padding: 32px 22px;
 
-  border-radius: 25px;
+  border-radius: 24px;
 
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.11);
 
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 
-  backdrop-filter: blur(15px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* City */
+/* -------------------------
+   City Name
+------------------------- */
 
 .weather-card h2 {
-  font-size: 30px;
+  font-size: 29px;
 
   font-weight: 600;
 
-  margin-bottom: 5px;
+  margin-bottom: 6px;
+
+  letter-spacing: -0.5px;
 }
 
-/* Temperature */
+/* -------------------------
+   Temperature
+------------------------- */
 
 .temperature {
-  font-size: 78px;
+  font-size: 76px;
 
   font-weight: 300;
 
   line-height: 1;
 
-  margin: 20px 0 12px;
+  margin: 22px 0 14px;
 
-  letter-spacing: -3px;
+  letter-spacing: -4px;
 }
 
-/* Weather condition */
+/* -------------------------
+   Weather Condition
+------------------------- */
 
 .weather-card > p {
-  font-size: 20px;
+  font-size: 19px;
 
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.86);
 
-  margin-bottom: 30px;
+  margin-bottom: 28px;
+
+  text-transform: capitalize;
 }
 
-/* Details */
+/* -------------------------
+   Weather Details
+------------------------- */
 
 .details {
   display: flex;
 
-  gap: 12px;
+  gap: 14px;
 
   justify-content: center;
 }
@@ -194,59 +249,107 @@ h1 {
 .detail {
   width: 50%;
 
-  padding: 18px 10px;
+  padding: 19px 12px;
 
-  border-radius: 18px;
+  border-radius: 17px;
 
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.1);
 
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+
+  transition: 0.2s;
 }
+
+.detail:hover {
+  background: rgba(255, 255, 255, 0.15);
+
+  transform: translateY(-2px);
+}
+
+/* -------------------------
+   Detail Icon
+------------------------- */
 
 .detail span {
   display: block;
 
-  font-size: 26px;
+  font-size: 25px;
 
-  margin-bottom: 8px;
+  margin-bottom: 7px;
 }
+
+/* -------------------------
+   Detail Label
+------------------------- */
 
 .detail p {
-  font-size: 14px;
+  font-size: 13px;
 
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.65);
 
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
+
+/* -------------------------
+   Detail Value
+------------------------- */
 
 .detail strong {
   font-size: 18px;
 
-  color: white;
+  font-weight: 600;
+
+  color: #ffffff;
 }
 
-/* Mobile */
+/* -------------------------
+   Mobile
+------------------------- */
 
 @media (max-width: 500px) {
-  .container {
-    padding: 25px 18px;
+  body {
+    padding: 16px;
+  }
 
-    border-radius: 25px;
+  .container {
+    padding: 28px 18px;
+
+    border-radius: 24px;
   }
 
   h1 {
     font-size: 32px;
   }
 
+  .subtitle {
+    font-size: 14px;
+  }
+
   .search-box {
     flex-direction: column;
+  }
+
+  .search-box input {
+    width: 100%;
   }
 
   .search-box button {
     width: 100%;
   }
 
+  .weather-card {
+    padding: 28px 16px;
+  }
+
   .temperature {
-    font-size: 65px;
+    font-size: 64px;
+  }
+
+  .details {
+    gap: 10px;
+  }
+
+  .detail {
+    padding: 16px 8px;
   }
 }
