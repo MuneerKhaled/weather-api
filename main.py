@@ -6,17 +6,22 @@ from dotenv import load_dotenv
 import httpx
 import os
 
+
 # Load environment variables
 load_dotenv()
+
 
 # Create FastAPI application
 app = FastAPI(title="Weather and Task API")
 
+
 # Get API key from .env
 API_KEY = os.getenv("API_KEY")
 
+
 # Store tasks
 tasks = []
+
 
 # Serve frontend files
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
