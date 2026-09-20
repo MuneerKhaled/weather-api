@@ -6,22 +6,17 @@ from dotenv import load_dotenv
 import httpx
 import os
 
-
 # Load environment variables
 load_dotenv()
 
-
-# Create FastAPI application
-app = FastAPI(title="Weather and Task API")
-
+# Create FastAPI app
+app = FastAPI(title="Weather API")
 
 # Get API key from .env
 API_KEY = os.getenv("API_KEY")
 
-
 # Store tasks
 tasks = []
-
 
 # Serve frontend files
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
@@ -41,12 +36,12 @@ def home():
 # -------------------------
 
 @app.get("/weather/{city}")
-async def get_weather(city: str):
+async def weather(city: str):
 
     if not API_KEY:
         raise HTTPException(
             status_code=500,
-            detail="API key is not configured"
+            detail="API_KEY is missing from .env"
         )
 
     url = "https://api.openweathermap.org/data/2.5/weather"
@@ -72,7 +67,7 @@ async def get_weather(city: str):
         "city": data["name"],
         "temperature": data["main"]["temp"],
         "humidity": data["main"]["humidity"],
-        "weather": data["weather"][0]["description"]
+        "condition": data["weather"][0]["main"]
     }
 
 
@@ -83,8 +78,8 @@ async def get_weather(city: str):
 class Task(BaseModel):
     title: str
     description: str
-    priority: str = "medium"
-    completed: bool = False
+    category: str = "daily"
+    status: str = "pending"
 
 
 # -------------------------
@@ -108,20 +103,17 @@ def create_task(task: Task):
 # -------------------------
 
 @app.get("/tasks")
-def get_all_tasks():
+def get_tasks():
 
-    return {
-        "total": len(tasks),
-        "tasks": tasks
-    }
+    return tasks
 
 
 # -------------------------
-# Get Single Task
+# Get One Task
 # -------------------------
 
 @app.get("/tasks/{task_id}")
-def get_single_task(task_id: int):
+def get_task(task_id: int):
 
     for task in tasks:
 
@@ -141,13 +133,13 @@ def get_single_task(task_id: int):
 @app.put("/tasks/{task_id}")
 def update_task(task_id: int, task: Task):
 
-    for existing_task in tasks:
+    for old_task in tasks:
 
-        if existing_task["id"] == task_id:
+        if old_task["id"] == task_id:
 
-            existing_task.update(task.model_dump())
+            old_task.update(task.model_dump())
 
-            return existing_task
+            return old_task
 
     raise HTTPException(
         status_code=404,
@@ -169,8 +161,7 @@ def delete_task(task_id: int):
             tasks.remove(task)
 
             return {
-                "message": "Task removed successfully",
-                "id": task_id
+                "message": "Task deleted"
             }
 
     raise HTTPException(
