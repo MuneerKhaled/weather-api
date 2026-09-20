@@ -1,3 +1,4 @@
+```python
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -191,3 +192,4 @@ def remove_note(note_id: int):
         status_code=404,
         detail="Note not found"
     )
+
