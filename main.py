@@ -6,17 +6,22 @@ from dotenv import load_dotenv
 import httpx
 import os
 
+
 # Load environment variables
 load_dotenv()
 
+
 # Create FastAPI app
-app = FastAPI(title="Weather API")
+app = FastAPI(title="Book and Weather API")
+
 
 # Get API key from .env
 API_KEY = os.getenv("API_KEY")
 
-# Store tasks
-tasks = []
+
+# Store books
+books = []
+
 
 # Serve frontend files
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
@@ -36,7 +41,7 @@ def home():
 # -------------------------
 
 @app.get("/weather/{city}")
-async def weather(city: str):
+async def get_weather(city: str):
 
     if not API_KEY:
         raise HTTPException(
@@ -72,99 +77,99 @@ async def weather(city: str):
 
 
 # -------------------------
-# Task Model
+# Book Model
 # -------------------------
 
-class Task(BaseModel):
+class Book(BaseModel):
     title: str
-    description: str
-    category: str = "daily"
-    status: str = "pending"
+    author: str
+    category: str = "general"
+    status: str = "available"
 
 
 # -------------------------
-# Create Task
+# Create Book
 # -------------------------
 
-@app.post("/tasks")
-def create_task(task: Task):
+@app.post("/books")
+def create_book(book: Book):
 
-    new_task = task.model_dump()
+    new_book = book.model_dump()
 
-    new_task["id"] = len(tasks) + 1
+    new_book["id"] = len(books) + 1
 
-    tasks.append(new_task)
+    books.append(new_book)
 
-    return new_task
-
-
-# -------------------------
-# Get All Tasks
-# -------------------------
-
-@app.get("/tasks")
-def get_tasks():
-
-    return tasks
+    return new_book
 
 
 # -------------------------
-# Get One Task
+# Get All Books
 # -------------------------
 
-@app.get("/tasks/{task_id}")
-def get_task(task_id: int):
+@app.get("/books")
+def get_books():
 
-    for task in tasks:
+    return books
 
-        if task["id"] == task_id:
-            return task
+
+# -------------------------
+# Get One Book
+# -------------------------
+
+@app.get("/books/{book_id}")
+def get_book(book_id: int):
+
+    for book in books:
+
+        if book["id"] == book_id:
+            return book
 
     raise HTTPException(
         status_code=404,
-        detail="Task not found"
+        detail="Book not found"
     )
 
 
 # -------------------------
-# Update Task
+# Update Book
 # -------------------------
 
-@app.put("/tasks/{task_id}")
-def update_task(task_id: int, task: Task):
+@app.put("/books/{book_id}")
+def update_book(book_id: int, book: Book):
 
-    for old_task in tasks:
+    for old_book in books:
 
-        if old_task["id"] == task_id:
+        if old_book["id"] == book_id:
 
-            old_task.update(task.model_dump())
+            old_book.update(book.model_dump())
 
-            return old_task
+            return old_book
 
     raise HTTPException(
         status_code=404,
-        detail="Task not found"
+        detail="Book not found"
     )
 
 
 # -------------------------
-# Delete Task
+# Delete Book
 # -------------------------
 
-@app.delete("/tasks/{task_id}")
-def delete_task(task_id: int):
+@app.delete("/books/{book_id}")
+def delete_book(book_id: int):
 
-    for task in tasks:
+    for book in books:
 
-        if task["id"] == task_id:
+        if book["id"] == book_id:
 
-            tasks.remove(task)
+            books.remove(book)
 
             return {
-                "message": "Task deleted"
+                "message": "Book deleted"
             }
 
     raise HTTPException(
         status_code=404,
-        detail="Task not found"
+        detail="Book not found"
     )
