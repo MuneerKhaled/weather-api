@@ -19,34 +19,55 @@ app = FastAPI(title="Book and Weather API")
 API_KEY = os.getenv("API_KEY")
 
 
-# Store books temporarily
-books = []
+# Book model
+class Book(BaseModel):
+    title: str
+    author: str
+    year: int
 
 
-# Serve frontend files
-app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
-
-
-# -------------------------
-# Frontend
-# -------------------------
-
+# Home route
 @app.get("/")
 def home():
-    return FileResponse("frontend/index.html")
+    return {"message": "Book and Weather API is running"}
 
 
-# -------------------------
-# Weather API
-# -------------------------
+# Get books
+@app.get("/books")
+def get_books():
+    return {
+        "books": [
+            {
+                "title": "The Alchemist",
+                "author": "Paulo Coelho",
+                "year": 1988
+            },
+            {
+                "title": "1984",
+                "author": "George Orwell",
+                "year": 1949
+            }
+        ]
+    }
 
+
+# Create a book
+@app.post("/books")
+def create_book(book: Book):
+    return {
+        "message": "Book created successfully",
+        "book": book
+    }
+
+
+# Weather route
 @app.get("/weather/{city}")
 async def get_weather(city: str):
 
     if not API_KEY:
         raise HTTPException(
             status_code=500,
-            detail="API_KEY is missing from .env"
+            detail="API key is missing"
         )
 
     url = "https://api.openweathermap.org/data/2.5/weather"
@@ -63,7 +84,7 @@ async def get_weather(city: str):
     if response.status_code != 200:
         raise HTTPException(
             status_code=response.status_code,
-            detail=response.json()
+            detail="Could not get weather data"
         )
 
     data = response.json()
@@ -72,103 +93,5 @@ async def get_weather(city: str):
         "city": data["name"],
         "temperature": data["main"]["temp"],
         "humidity": data["main"]["humidity"],
-        "condition": data["weather"][0]["main"]
+        "weather": data["weather"][0]["description"]
     }
-
-
-# -------------------------
-# Book Model
-# -------------------------
-
-class Book(BaseModel):
-    title: str
-    author: str
-    category: str = "general"
-    status: str = "available"
-
-
-# -------------------------
-# CREATE - Add Book
-# -------------------------
-
-@app.post("/books")
-def create_book(book: Book):
-
-    new_book = book.model_dump()
-
-    new_book["id"] = len(books) + 1
-
-    books.append(new_book)
-
-    return new_book
-
-
-# -------------------------
-# READ - Get All Books
-# -------------------------
-
-@app.get("/books")
-def get_books():
-
-    return books
-
-
-# -------------------------
-# READ - Get One Book
-# -------------------------
-
-@app.get("/books/{book_id}")
-def get_book(book_id: int):
-
-    for book in books:
-
-        if book["id"] == book_id:
-            return book
-
-    raise HTTPException(
-        status_code=404,
-        detail="Book not found"
-    )
-
-
-# -------------------------
-# UPDATE - Update Book
-# -------------------------
-
-@app.put("/books/{book_id}")
-def update_book(book_id: int, book: Book):
-
-    for old_book in books:
-
-        if old_book["id"] == book_id:
-
-            old_book.update(book.model_dump())
-
-            return old_book
-
-    raise HTTPException(
-        status_code=404,
-        detail="Book not found"
-    )
-
-
-# -------------------------
-# DELETE - Delete Book
-# -------------------------
-
-@app.delete("/books/{book_id}")
-def delete_book(book_id: int):
-
-    for book in books:
-
-        if book["id"] == book_id:
-
-            books.remove(book)
-
-            return {
-                "message": "Book deleted"
-            }
-    raise HTTPException(
-        status_code=404,
-        detail="Book not found"
-    )
