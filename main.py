@@ -19,7 +19,7 @@ app = FastAPI(title="Book and Weather API")
 API_KEY = os.getenv("API_KEY")
 
 
-# Store books
+# Store books temporarily
 books = []
 
 
@@ -88,7 +88,7 @@ class Book(BaseModel):
 
 
 # -------------------------
-# Create Book
+# CREATE - Add Book
 # -------------------------
 
 @app.post("/books")
@@ -104,7 +104,7 @@ def create_book(book: Book):
 
 
 # -------------------------
-# Get All Books
+# READ - Get All Books
 # -------------------------
 
 @app.get("/books")
@@ -114,7 +114,7 @@ def get_books():
 
 
 # -------------------------
-# Get One Book
+# READ - Get One Book
 # -------------------------
 
 @app.get("/books/{book_id}")
@@ -132,7 +132,7 @@ def get_book(book_id: int):
 
 
 # -------------------------
-# Update Book
+# UPDATE - Update Book
 # -------------------------
 
 @app.put("/books/{book_id}")
@@ -153,7 +153,7 @@ def update_book(book_id: int, book: Book):
 
 
 # -------------------------
-# Delete Book
+# DELETE - Delete Book
 # -------------------------
 
 @app.delete("/books/{book_id}")
