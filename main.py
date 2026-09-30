@@ -6,42 +6,67 @@ from dotenv import load_dotenv
 import httpx
 import os
 
-# Load environment variables
+
+# ==========================================
+# Environment Configuration
+# ==========================================
+
 load_dotenv()
 
-# Create FastAPI app
-app = FastAPI(title="Book and Weather API")
-
-# Get API key from .env
 API_KEY = os.getenv("API_KEY")
 
-# Store books temporarily
+
+# ==========================================
+# FastAPI Application
+# ==========================================
+
+app = FastAPI(
+    title="Book and Weather API",
+    description="A FastAPI project providing book management and weather information.",
+    version="1.0.0",
+)
+
+
+# ==========================================
+# Temporary Book Storage
+# ==========================================
+
 books = []
 
-# Serve frontend files
-app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 
-
-# -------------------------
+# ==========================================
 # Frontend
-# -------------------------
+# ==========================================
+
+app.mount(
+    "/frontend",
+    StaticFiles(directory="frontend"),
+    name="frontend",
+)
+
 
 @app.get("/")
 def home():
+    """
+    Serve the frontend homepage.
+    """
     return FileResponse("frontend/index.html")
 
 
-# -------------------------
+# ==========================================
 # Weather API
-# -------------------------
+# ==========================================
 
 @app.get("/weather/{city}")
 async def get_weather(city: str):
+    """
+    Get current weather information for a city.
+    """
 
     if not API_KEY:
         raise HTTPException(
             status_code=500,
-            detail="API_KEY is missing from .env"
+            detail="API_KEY is missing from .env",
         )
 
     url = "https://api.openweathermap.org/data/2.5/weather"
@@ -49,16 +74,20 @@ async def get_weather(city: str):
     params = {
         "q": city,
         "appid": API_KEY,
-        "units": "metric"
+        "units": "metric",
     }
 
     async with httpx.AsyncClient() as client:
-        response = await client.get(url, params=params)
+
+        response = await client.get(
+            url,
+            params=params,
+        )
 
     if response.status_code != 200:
         raise HTTPException(
             status_code=response.status_code,
-            detail=response.json()
+            detail=response.json(),
         )
 
     data = response.json()
@@ -67,13 +96,13 @@ async def get_weather(city: str):
         "city": data["name"],
         "temperature": data["main"]["temp"],
         "humidity": data["main"]["humidity"],
-        "condition": data["weather"][0]["main"]
+        "condition": data["weather"][0]["main"],
     }
 
 
-# -------------------------
-# Book Model
-# -------------------------
+# ==========================================
+# Book Schema
+# ==========================================
 
 class Book(BaseModel):
     title: str
@@ -82,38 +111,51 @@ class Book(BaseModel):
     status: str = "available"
 
 
-# -------------------------
-# CREATE - Add Book
-# -------------------------
+# ==========================================
+# CREATE
+# ==========================================
 
-@app.post("/books")
+@app.post("/books", status_code=201)
 def create_book(book: Book):
+    """
+    Create a new book.
+    """
 
-    new_book = book.model_dump()
-
-    new_book["id"] = len(books) + 1
+    new_book = {
+        "id": len(books) + 1,
+        **book.model_dump(),
+    }
 
     books.append(new_book)
 
     return new_book
 
 
-# -------------------------
-# READ - Get All Books
-# -------------------------
+# ==========================================
+# READ - All Books
+# ==========================================
 
 @app.get("/books")
 def get_books():
+    """
+    Get all books.
+    """
 
-    return books
+    return {
+        "count": len(books),
+        "books": books,
+    }
 
 
-# -------------------------
-# READ - Get One Book
-# -------------------------
+# ==========================================
+# READ - Single Book
+# ==========================================
 
 @app.get("/books/{book_id}")
 def get_book(book_id: int):
+    """
+    Get a book by ID.
+    """
 
     for book in books:
 
@@ -122,37 +164,45 @@ def get_book(book_id: int):
 
     raise HTTPException(
         status_code=404,
-        detail="Book not found"
+        detail="Book not found",
     )
 
 
-# -------------------------
-# UPDATE - Update Book
-# -------------------------
+# ==========================================
+# UPDATE
+# ==========================================
 
 @app.put("/books/{book_id}")
 def update_book(book_id: int, book: Book):
+    """
+    Update an existing book.
+    """
 
-    for old_book in books:
+    for existing_book in books:
 
-        if old_book["id"] == book_id:
+        if existing_book["id"] == book_id:
 
-            old_book.update(book.model_dump())
+            existing_book.update(
+                book.model_dump()
+            )
 
-            return old_book
+            return existing_book
 
     raise HTTPException(
         status_code=404,
-        detail="Book not found"
+        detail="Book not found",
     )
 
 
-# -------------------------
-# DELETE - Delete Book
-# -------------------------
+# ==========================================
+# DELETE
+# ==========================================
 
 @app.delete("/books/{book_id}")
 def delete_book(book_id: int):
+    """
+    Delete a book by ID.
+    """
 
     for book in books:
 
@@ -161,10 +211,11 @@ def delete_book(book_id: int):
             books.remove(book)
 
             return {
-                "message": "Book deleted"
+                "message": "Book deleted successfully",
+                "book_id": book_id,
             }
 
     raise HTTPException(
         status_code=404,
-        detail="Book not found"
+        detail="Book not found",
     )
