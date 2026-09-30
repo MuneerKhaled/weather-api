@@ -78,7 +78,6 @@ async def get_weather(city: str):
     }
 
     async with httpx.AsyncClient() as client:
-
         response = await client.get(
             url,
             params=params,
@@ -158,7 +157,6 @@ def get_book(book_id: int):
     """
 
     for book in books:
-
         if book["id"] == book_id:
             return book
 
@@ -179,7 +177,6 @@ def update_book(book_id: int, book: Book):
     """
 
     for existing_book in books:
-
         if existing_book["id"] == book_id:
 
             existing_book.update(
@@ -205,7 +202,6 @@ def delete_book(book_id: int):
     """
 
     for book in books:
-
         if book["id"] == book_id:
 
             books.remove(book)
